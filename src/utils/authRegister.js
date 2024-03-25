@@ -15,6 +15,8 @@ module.exports = async function authRegister(botId, guildID) {
 
     const data = botData.guildData
     data[0][guildID] = {
+        eventNotification: false,
+        giveNotificationOnJoin: false,
         feedChannels: [],
         eventChannels: []
     }

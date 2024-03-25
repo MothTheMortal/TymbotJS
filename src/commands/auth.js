@@ -5,7 +5,7 @@ const authCheck = require('../utils/authCheck')
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('integrate')
+        .setName('integration')
         .setDescription('Authenticate the bot!')
         .addStringOption(option =>
             option.setName("bot_id")

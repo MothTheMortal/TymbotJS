@@ -51,6 +51,10 @@ module.exports = {
                 return await interaction.followUp(`<#${channel.id}> is already a feed channel!`)
             }
 
+            if (botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
+                return await interaction.followUp(`<#${channel.id}> is already an event channel!`)
+            }
+
             await addFeedChannel(channel.id, channel.guildId);
             await interaction.followUp(`<#${channel.id}> has been added to the feed.`)
         }
