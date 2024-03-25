@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, ChannelType, EmbedBuilder } = require('discord.js');
 const authenticate = require('../utils/authCheck');
 const addFeedChannel = require('../utils/feedChannelAdd');
 const removeFeedChannel = require('../utils/feedChannelRemove');
+const getChannelByID = require('../utils/getChannelByID');
 
 const commandData = new SlashCommandBuilder()
     .setName("feed-channel")
@@ -25,6 +26,9 @@ const commandData = new SlashCommandBuilder()
                     .addChannelTypes(ChannelType.GuildText)
                     .setRequired(true)
             )
+    ).addSubcommand(subcommand =>
+        subcommand.setName("view")
+            .setDescription("Shows a list of the feed channels")
     )
 
 
@@ -33,6 +37,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         const auth = await authenticate(interaction.guildId);
+
         if (!auth) {
             return await interaction.followUp({ content: "Please authenticate the bot before running any commands." })
         }
@@ -42,7 +47,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === 'add') {
             const channel = interaction.options.getChannel('channel')
 
-            if (botData.feedChannels.includes(channel.id.toString())) {
+            if (botData.guildData[0][interaction.guildId].feedChannels.includes(channel.id.toString())) {
                 return await interaction.followUp(`<#${channel.id}> is already a feed channel!`)
             }
 
@@ -53,12 +58,34 @@ module.exports = {
         else if (interaction.options.getSubcommand() === 'remove') {
             const channel = interaction.options.getChannel('channel')
 
-            if (!botData.feedChannels.includes(channel.id.toString())) {
+            if (!botData.guildData[0][interaction.guildId].feedChannels.includes(channel.id.toString())) {
                 return await interaction.followUp(`<#${channel.id}> is not a feed channel!`)
             }
 
             await removeFeedChannel(channel.id, channel.guildId)
             await interaction.followUp(`<#${channel.id}> has been removed from the feed.`)
+        }
+        else {
+
+            let description = ""
+
+            if (botData.guildData[0][interaction.guildId].feedChannels.length > 0) {
+
+                for (let channelID of botData.guildData[0][interaction.guildId].feedChannels) {
+                    description += `- #${await getChannelByID(channelID, interaction)}\n`
+                }
+
+            } else {
+                description = "None"
+            }
+
+            const msgEmbed = new EmbedBuilder()
+                .setTitle(`Feed Channels (${botData.guildData[0][interaction.guildId].feedChannels.length})`)
+                .setDescription(description)
+
+            await interaction.followUp({ embeds: [msgEmbed] })
+
+
         }
     }
 }

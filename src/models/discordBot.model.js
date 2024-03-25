@@ -15,11 +15,11 @@ const discordBotSchema = new mongoose.Schema({
             return arr.length <= this.maxGuilds;
         }
     },
-    feedChannels: {
-        type: Array
-    },
-    eventChannel: {
-        type: String
+    guildData: {
+        type: Array,
+        default: [
+            {}
+        ]
     },
     chatbot: {
         type: mongoose.SchemaTypes.ObjectId,
@@ -49,6 +49,6 @@ discordBotSchema.methods.toJson = function () {
     return obj;
 };
 
-const discordBotModel = mongoose.model("DiscordBot", discordBotSchema, "discordBots");
+const discordBotModel = mongoose.model("discordBot", discordBotSchema, "discordBots");
 
 module.exports = discordBotModel;
