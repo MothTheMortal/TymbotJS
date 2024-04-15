@@ -1,20 +1,23 @@
 const discordBots = require("../models/discordBot.model");
+const status = require("../utils/status")
+const {guildLengthExceeded} = require("./status");
 
 module.exports = async function authRegister(botId, guildID) {
     const discordBot = await discordBots.findOne({ botId });
 
     if (!discordBot) {
-        return false
+        return status.chatbotNotFound
     }
 
     const botData = discordBot.toJson();
 
     if (botData.discordGuilds.length >= botData.maxGuilds) {
-        return false
+        return guildLengthExceeded
     }
 
     const data = botData.guildData
     data[0][guildID] = {
+        adminRoleId: false,
         eventNotification: false,
         giveNotificationOnJoin: false,
         feedChannels: [],
@@ -24,5 +27,5 @@ module.exports = async function authRegister(botId, guildID) {
     await discordBots.updateOne({ botId }, {$push: {discordGuilds: guildID.toString()}})
 
 
-    return true
+    return status.integrationSuccessful
 };

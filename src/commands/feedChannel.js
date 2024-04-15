@@ -3,6 +3,7 @@ const authenticate = require('../utils/authCheck');
 const addFeedChannel = require('../utils/feedChannelAdd');
 const removeFeedChannel = require('../utils/feedChannelRemove');
 const getChannelByID = require('../utils/getChannelByID');
+const status = require('../utils/status')
 
 const commandData = new SlashCommandBuilder()
     .setName("feed-channel")
@@ -39,7 +40,7 @@ module.exports = {
         const auth = await authenticate(interaction.guildId);
 
         if (!auth) {
-            return await interaction.followUp({ content: "Please authenticate the bot before running any commands." })
+            return await status.botNotAuthenticated(interaction)
         }
 
         const botData = auth.toJson();
@@ -48,26 +49,26 @@ module.exports = {
             const channel = interaction.options.getChannel('channel')
 
             if (botData.guildData[0][interaction.guildId].feedChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is already a feed channel!`)
+                return await status.alreadyFeedChannel(interaction)
             }
 
             if (botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is already an event channel!`)
+                return await status.alreadyEventChannel(interaction)
             }
 
             await addFeedChannel(channel.id, channel.guildId);
-            await interaction.followUp(`<#${channel.id}> has been added to the feed.`)
+            await status.feedChannelAddSuccessful(interaction)
         }
 
         else if (interaction.options.getSubcommand() === 'remove') {
             const channel = interaction.options.getChannel('channel')
 
             if (!botData.guildData[0][interaction.guildId].feedChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is not a feed channel!`)
+                return await status.notAFeedChannel(interaction)
             }
 
             await removeFeedChannel(channel.id, channel.guildId)
-            await interaction.followUp(`<#${channel.id}> has been removed from the feed.`)
+            await status.feedChannelRemoveSuccessful(interaction)
         }
         else {
 

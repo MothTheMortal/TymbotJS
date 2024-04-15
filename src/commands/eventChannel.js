@@ -4,6 +4,8 @@ const addEventChannel = require('../utils/eventChannelAdd');
 const removeEventChannel = require('../utils/eventChannelRemove');
 const getChannelByID = require('../utils/getChannelByID');
 const eventUpdate = require('../utils/updateAnnoucementRole')
+const status = require("../utils/status")
+
 
 const commandData = new SlashCommandBuilder()
     .setName("event")
@@ -58,7 +60,7 @@ module.exports = {
         const auth = await authenticate(interaction.guildId);
 
         if (!auth) {
-            return await interaction.followUp({ content: "Please authenticate the bot before running any commands." })
+            return await status.botNotAuthenticated(interaction)
         }
 
         const botData = auth.toJson();
@@ -67,26 +69,26 @@ module.exports = {
             const channel = interaction.options.getChannel('channel')
 
             if (botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is already an event channel!`)
+                return await status.alreadyEventChannel(interaction)
             }
 
             if (botData.guildData[0][interaction.guildId].feedChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is already a feed channel!`)
+                return await status.alreadyFeedChannel(interaction)
             }
 
 
             await addEventChannel(channel.id, channel.guildId);
-            await interaction.followUp(`<#${channel.id}> has been added to the event list.`)
+            await status.eventChannelAddSuccessful(interaction)
         }
         else if (interaction.options.getSubcommand() === 'remove-channel') {
             const channel = interaction.options.getChannel('channel')
 
             if (!botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
-                return await interaction.followUp(`<#${channel.id}> is not an event channel!`)
+                return await status.notAnEventChannel(interaction)
             }
 
             await removeEventChannel(channel.id, channel.guildId)
-            await interaction.followUp(`<#${channel.id}> has been removed from the event list.`)
+            await status.eventChannelRemoveSuccessful()
         }
         else if (interaction.options.getSubcommand() === 'view-channels') {
 
@@ -117,14 +119,14 @@ module.exports = {
                 const notificationRole = interaction.options.getRole('role')
 
                 if (!notificationRole) {
-                    return await interaction.followUp('Please provide a role.')
+                    return await status.roleNotGiven(interaction)
                 }
 
                 const botMember = await interaction.guild.members.fetch(interaction.client.user.id)
                 const highestBotRole = botMember.roles.highest
 
                 if (highestBotRole.position <= notificationRole.position) {
-                    return await interaction.followUp('The bot does not have enough permission to assign that role. Please use a different role or provide the bot a higher role.')
+                    return await status.insufficientRoleAssignmentPermission(interaction)
                 }
 
                 await eventUpdate(interaction.guildId, notifyBool, joinBool, notificationRole.id)

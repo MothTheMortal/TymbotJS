@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const authenticate = require('../utils/authRegister')
 const authCheck = require('../utils/authCheck')
-
+const status = require("../utils/status")
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,16 +16,11 @@ module.exports = {
         await interaction.deferReply();
 
         if (await authCheck(interaction.guildId)) {
-            return await interaction.followUp({ content: "This discord server already has an active integration.", ephemeral: true })
+            return await status.integrationAlreadyActive(interaction)
         }
 
         const botID = interaction.options.getString("bot_id");
         const auth = await authenticate(botID, interaction.guildId);
-        if (auth) {
-            await interaction.followUp({ content: "Integration Successful!", ephemeral: true})
-        }
-        else {
-            await interaction.followUp({ content: "Integration Failed!", ephemeral: true})
-        }
+        await auth(interaction)
     }
 };
