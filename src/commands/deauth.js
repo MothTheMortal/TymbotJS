@@ -12,6 +12,10 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
+        if (interaction.guild.ownerId !== interaction.user.id) {
+            return await status.memberNotOwner(interaction)
+        }
+
         const data = await authenticate(interaction.guildId);
 
         if (data) {

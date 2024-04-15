@@ -15,6 +15,10 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
+        if (interaction.guild.ownerId !== interaction.user.id) {
+            return await status.memberNotOwner(interaction)
+        }
+
         if (await authCheck(interaction.guildId)) {
             return await status.integrationAlreadyActive(interaction)
         }

@@ -4,6 +4,7 @@ const addFeedChannel = require('../utils/feedChannelAdd');
 const removeFeedChannel = require('../utils/feedChannelRemove');
 const getChannelByID = require('../utils/getChannelByID');
 const status = require('../utils/status')
+const adminCheck = require('../utils/adminCheck')
 
 const commandData = new SlashCommandBuilder()
     .setName("feed-channel")
@@ -41,6 +42,12 @@ module.exports = {
 
         if (!auth) {
             return await status.botNotAuthenticated(interaction)
+        }
+
+        const check = await adminCheck(interaction.guildId, interaction)
+
+        if (check !== undefined) {
+            return
         }
 
         const botData = auth.toJson();

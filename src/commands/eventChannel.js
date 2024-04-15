@@ -5,6 +5,7 @@ const removeEventChannel = require('../utils/eventChannelRemove');
 const getChannelByID = require('../utils/getChannelByID');
 const eventUpdate = require('../utils/updateAnnoucementRole')
 const status = require("../utils/status")
+const adminCheck = require("../utils/adminCheck");
 
 
 const commandData = new SlashCommandBuilder()
@@ -61,6 +62,12 @@ module.exports = {
 
         if (!auth) {
             return await status.botNotAuthenticated(interaction)
+        }
+
+        const check = await adminCheck(interaction.guildId, interaction)
+
+        if (check !== undefined) {
+            return
         }
 
         const botData = auth.toJson();

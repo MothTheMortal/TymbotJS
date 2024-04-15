@@ -4,6 +4,12 @@ const successColor = "#00FF00";
 const errorColor = "#FF0000";
 
 
+async function adminRoleNotFound(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Please assign an admin role with /admin-role before utilizing any commands.")
+        .setColor(errorColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
 
 async function memberNotAdmin(interaction) {
     const statusEmbed = new EmbedBuilder()
@@ -25,7 +31,6 @@ async function guildLengthExceeded(interaction) {
         .setColor(errorColor);
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
-
 
 async function adminRoleSuccess(interaction) {
     const statusEmbed = new EmbedBuilder()
@@ -181,5 +186,7 @@ module.exports = {
     adminRoleSuccess,
     chatbotNotFound,
     guildLengthExceeded,
-    memberNotOwner
+    memberNotOwner,
+    adminRoleNotFound,
+    memberNotAdmin
 }
