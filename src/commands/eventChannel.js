@@ -95,7 +95,7 @@ module.exports = {
             }
 
             await removeEventChannel(channel.id, channel.guildId)
-            await status.eventChannelRemoveSuccessful()
+            await status.eventChannelRemoveSuccessful(interaction)
         }
         else if (interaction.options.getSubcommand() === 'view-channels') {
 

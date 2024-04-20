@@ -160,7 +160,7 @@ async function insufficientRoleAssignmentPermission(interaction) {
 
 async function botNotAuthenticated(interaction) {
     const statusEmbed = new EmbedBuilder()
-        .setTitle("Bot is not authenticated.")
+        .setTitle("Bot is not authenticated. (/integration)")
         .setColor(errorColor);
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
