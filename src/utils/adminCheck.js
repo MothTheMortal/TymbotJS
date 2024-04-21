@@ -11,9 +11,9 @@ module.exports = async function adminCheck(guildID, interaction) {
 
     const role = await interaction.guild.roles.fetch(roleId)
 
-
-    if (!await interaction.member.roles.cache.has(role.id)) {
+    if (!await interaction.member.roles.cache.has(role.id) && !interaction.guild.ownerId === interaction.user.id) {
         return await status.memberNotAdmin(interaction)
     }
+
 
 };

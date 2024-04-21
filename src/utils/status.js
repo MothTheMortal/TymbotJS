@@ -153,7 +153,7 @@ async function roleNotGiven(interaction) {
 
 async function insufficientRoleAssignmentPermission(interaction) {
     const statusEmbed = new EmbedBuilder()
-        .setTitle("Insufficient permission to assign roles.")
+        .setTitle("Bot has insufficient permission to assign that roles.")
         .setColor(errorColor);
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
