@@ -50,7 +50,7 @@ module.exports = {
             **Event Channels (${guildData['eventChannels'].length}):** ${guildData['eventChannels'].length ? guildData['eventChannels'].map(id => `<#${id}>`).join(', ') : 'None'}
             `
 
-            embed.setTitle("Bot Information").setDescription(description).setFooter({ text: "Created by: MothTheMortal"})
+            embed.setTitle("Bot Information").setDescription(description).setFooter({ text: "Created by: Apnatomy"})
 
         }
         else if (choice === "feed") {
