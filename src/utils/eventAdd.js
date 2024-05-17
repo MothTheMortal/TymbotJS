@@ -1,9 +1,15 @@
 const discordBots = require("../models/discordBot.model");
 
-module.exports = async function removeEventChannel(channelID, guildID) {
+module.exports = async function eventAdd(eventId, guildID) {
     const discordBot = await discordBots.findOne({discordGuilds: guildID.toString()});
-
     const data = discordBot.guildData
-    data[0][guildID]["eventChannels"].pop(channelID.toString())
+
+    const eventData = {
+        id: eventId.toString(),
+        reminders: []
+    }
+
+    data[0][guildID]["events"].push(eventData)
     await discordBots.updateOne({discordGuilds: guildID.toString()}, {$set: {guildData: data}})
+
 }

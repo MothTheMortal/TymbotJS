@@ -39,6 +39,13 @@ async function adminRoleSuccess(interaction) {
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
 
+async function reviewChannelSuccess(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("The channel has been successfully set as the review channel.")
+        .setColor(successColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
 async function duplicateRole(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("This role is already set as an Administrator.")
@@ -46,6 +53,19 @@ async function duplicateRole(interaction) {
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
 
+async function duplicateReviewChannel(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("This channel is already set as a review channel.")
+        .setColor(defaultColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
+async function channelNotPrivate(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Please select a private text channel.")
+        .setColor(errorColor);
+    return await interaction.followUp({embeds: [statusEmbed]});
+}
 async function integrationAlreadyActive(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("Integration is already active.")
@@ -104,7 +124,7 @@ async function alreadyFeedChannel(interaction) {
 
 async function eventChannelAddSuccessful(interaction) {
     const statusEmbed = new EmbedBuilder()
-        .setTitle("Event channel added successfully.")
+        .setTitle("Event channel set successfully.")
         .setColor(successColor);
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
@@ -165,6 +185,13 @@ async function botNotAuthenticated(interaction) {
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
 
+async function defaultTextSet(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("The default text has been set successfully!")
+        .setColor(successColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
 module.exports = {
     botNotAuthenticated,
     integrationAlreadyActive,
@@ -188,5 +215,9 @@ module.exports = {
     guildLengthExceeded,
     memberNotOwner,
     adminRoleNotFound,
-    memberNotAdmin
+    memberNotAdmin,
+    duplicateReviewChannel,
+    reviewChannelSuccess,
+    channelNotPrivate,
+    defaultTextSet
 }

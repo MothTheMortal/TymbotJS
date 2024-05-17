@@ -1,9 +1,10 @@
 const fs = require("node:fs");
 const updateKnowledgeBase = require('../utils/updateKnowledgeBase');
+const getEventById = require('../utils/getEventByID');
 const authenticate = require("./authCheck");
 const discordBots = require("../models/discordBot.model");
 
-module.exports = async function eventAnnouncement(event) {
+module.exports = async function eventAnnouncement(event, text='None') {
     const auth = await authenticate(event.guild.id)
     const guildData = auth.guildData
 
@@ -11,12 +12,15 @@ module.exports = async function eventAnnouncement(event) {
     let rolePing = "";
 
     if (notify) {
-        rolePing = `<@&${notify}> `
+        rolePing = ` <@&${notify}>`
     }
 
-    for (const eventChannelID of guildData[0][event.guild.id].eventChannels) {
-        const eventChannel = await event.client.channels.fetch(eventChannelID);
-        await eventChannel.send({ content: rolePing + `[New Event!](${event.url})`})
+    if (text === 'None') {
+        text = guildData[0][event.guild.id]['eventDefaultText']
     }
+
+    const eventChannel = await event.client.channels.fetch(guildData[0][event.guild.id].eventChannelId);
+    await eventChannel.send({ content: text + rolePing + `[.](${event.url})`})
+
 
 }

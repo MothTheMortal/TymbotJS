@@ -29,21 +29,21 @@ module.exports = async function chatbotResponse(message, clientID) {
                 }
                 else if (reaction.emoji.name === '👎') {
                     const auth = await authenticate(oldMessage.guild.id)
-                    const staffRoleId = auth['guildData'][0][oldMessage.guild.id.toString()]['adminRoleId']
-                    if (staffRoleId) {
-                        const staffRole = await oldMessage.guild.roles.fetch(staffRoleId);
-                        const memberCollection = staffRole.members.toJSON()
-                        for await (const member of memberCollection) {
-                            try {
-                                let dmChannel = member.dmChannel
-                                if (!dmChannel) {
-                                    dmChannel = await member.createDM()
-                                }
-                                await dmChannel.send(`**<@${oldMessage.author.id}>(${oldMessage.author.username}) disliked a response**\n**Query:** ${messageContent}\n**Response:** ${response.data.response}`)
+                    const reviewChannelId = auth['guildData'][0][oldMessage.guild.id.toString()]['reviewChannelId']
+                    let channel;
 
-                            } catch (error) {}
+                    if (reviewChannelId) {
+                        channel = await oldMessage.guild.channels.fetch(reviewChannelId)
+                    }
+                    else {
+                        const owner = await oldMessage.guild.members.fetch(oldMessage.guild.ownerId)
+                        channel = owner.dmChannel
+                        if (!channel) {
+                            channel = await owner.createDM()
                         }
                     }
+
+                    await channel.send(`**<@${oldMessage.author.id}>(${oldMessage.author.username}) disliked a response**\n**Query:** ${messageContent}\n**Response:** ${response.data.response}`)
 
                 }
                 await message.reactions.removeAll()

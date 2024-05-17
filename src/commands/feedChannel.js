@@ -59,7 +59,7 @@ module.exports = {
                 return await status.alreadyFeedChannel(interaction)
             }
 
-            if (botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
+            if (botData.guildData[0][interaction.guildId].eventChannelId === channel.id.toString()) {
                 return await status.alreadyEventChannel(interaction)
             }
 

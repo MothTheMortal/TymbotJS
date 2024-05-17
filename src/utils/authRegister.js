@@ -16,12 +16,16 @@ module.exports = async function authRegister(botId, guildID) {
     }
 
     const data = botData.guildData
+
     data[0][guildID] = {
         adminRoleId: false,
         eventNotification: false,
         giveNotificationOnJoin: false,
+        reviewChannelId: false,
+        eventChannelId: false,
+        eventDefaultText: 'New Event!',
+        events: [],
         feedChannels: [],
-        eventChannels: []
     }
     await discordBots.updateOne({ botId }, {$set: {guildData: data}})
     await discordBots.updateOne({ botId }, {$push: {discordGuilds: guildID.toString()}})

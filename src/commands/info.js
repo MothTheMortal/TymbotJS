@@ -43,11 +43,11 @@ module.exports = {
             let description = `
             **Chatbot:** ${chatbotName}
             **Discord Server (${auth['discordGuilds'].length}/${auth['maxGuilds']}):** ${discordGuildNames.join(', ')}
-            **Staff Role:** <@&${guildData['adminRoleId']}>
+            **Staff Role:** ${guildData['adminRoleId'] ? `<@&${guildData['adminRoleId']}>` : 'None'}
             **Auto-Role:** ${guildData['giveNotificationOnJoin'] ? "Enabled" : "Disabled"}
             **Notification Role:** ${guildData['eventNotification'] ? `<@&${guildData['eventNotification']}>` : 'None'}
+            **Event Channel:** ${guildData['eventChannelId'] ? `<#${guildData['eventChannelId']}>` : 'None'}
             **Feed Channels (${guildData['feedChannels'].length}):** ${guildData['feedChannels'].length ? guildData['feedChannels'].map(id => `<#${id}>`).join(', ') : 'None'}
-            **Event Channels (${guildData['eventChannels'].length}):** ${guildData['eventChannels'].length ? guildData['eventChannels'].map(id => `<#${id}>`).join(', ') : 'None'}
             `
 
             embed.setTitle("Bot Information").setDescription(description).setFooter({ text: "Created by: Apnatomy"})

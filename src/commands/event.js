@@ -1,11 +1,10 @@
 const { SlashCommandBuilder, ChannelType, EmbedBuilder } = require('discord.js');
 const authenticate = require('../utils/authCheck');
 const addEventChannel = require('../utils/eventChannelAdd');
-const removeEventChannel = require('../utils/eventChannelRemove');
-const getChannelByID = require('../utils/getChannelByID');
 const eventUpdate = require('../utils/updateAnnoucementRole')
 const status = require("../utils/status")
 const adminCheck = require("../utils/adminCheck");
+const discordBots = require("../models/discordBot.model");
 
 
 const commandData = new SlashCommandBuilder()
@@ -31,27 +30,23 @@ const commandData = new SlashCommandBuilder()
             )
     )
     .addSubcommand(subcommand =>
-        subcommand.setName("add-channel")
-            .setDescription("Adds an event channel.")
-            .addChannelOption(option =>
-                option.setName("channel")
-                    .setDescription("The selected channel.")
-                    .addChannelTypes(ChannelType.GuildText)
+        subcommand.setName('announcement-default-text')
+            .setDescription("The default text in the annoucement of every Discord Event")
+            .addStringOption(option =>
+                option.setName('text')
+                    .setDescription('The text to be shown in the annoucement')
                     .setRequired(true)
             )
     )
     .addSubcommand(subcommand =>
-        subcommand.setName("remove-channel")
-            .setDescription("Removes an event channel.")
+        subcommand.setName("announcement-channel")
+            .setDescription("Sets an event annoucement channel.")
             .addChannelOption(option =>
                 option.setName("channel")
                     .setDescription("The selected channel.")
                     .addChannelTypes(ChannelType.GuildText)
                     .setRequired(true)
             )
-    ).addSubcommand(subcommand =>
-        subcommand.setName("view-channels")
-            .setDescription("Shows a list of the event channels.")
     )
 
 module.exports = {
@@ -72,10 +67,10 @@ module.exports = {
 
         const botData = auth.toJson();
 
-        if (interaction.options.getSubcommand() === 'add-channel') {
+        if (interaction.options.getSubcommand() === 'announcement-channel') {
             const channel = interaction.options.getChannel('channel')
 
-            if (botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
+            if (botData.guildData[0][interaction.guildId].eventChannelId === (channel.id.toString())) {
                 return await status.alreadyEventChannel(interaction)
             }
 
@@ -87,38 +82,16 @@ module.exports = {
             await addEventChannel(channel.id, channel.guildId);
             await status.eventChannelAddSuccessful(interaction)
         }
-        else if (interaction.options.getSubcommand() === 'remove-channel') {
-            const channel = interaction.options.getChannel('channel')
 
-            if (!botData.guildData[0][interaction.guildId].eventChannels.includes(channel.id.toString())) {
-                return await status.notAnEventChannel(interaction)
-            }
-
-            await removeEventChannel(channel.id, channel.guildId)
-            await status.eventChannelRemoveSuccessful(interaction)
+        else if (interaction.options.getSubcommand() === 'announcement-default-text') {
+            const text = interaction.options.getString('text')
+            const discordBot = await discordBots.findOne({discordGuilds: interaction.guild.id.toString()});
+            const data = discordBot.guildData
+            data[0][interaction.guild.id.toString()]["eventDefaultText"] = text
+            await discordBots.updateOne({discordGuilds: interaction.guild.id.toString()}, {$set: {guildData: data}})
+            await status.defaultTextSet(interaction)
         }
-        else if (interaction.options.getSubcommand() === 'view-channels') {
 
-            let description = ""
-
-            if (botData.guildData[0][interaction.guildId].eventChannels.length > 0) {
-
-                for (let channelID of botData.guildData[0][interaction.guildId].eventChannels) {
-                    description += `- #${await getChannelByID(channelID, interaction)}\n`
-                }
-
-            } else {
-                description = "None"
-            }
-
-            const msgEmbed = new EmbedBuilder()
-                .setTitle(`Event Channels (${botData.guildData[0][interaction.guildId].eventChannels.length})`)
-                .setDescription(description)
-
-            await interaction.followUp({ embeds: [msgEmbed] })
-
-
-        }
         else if (interaction.options.getSubcommand() === 'notification') {
             const notifyBool = interaction.options.getBoolean('notify');
             const joinBool = interaction.options.getBoolean('on-join')
