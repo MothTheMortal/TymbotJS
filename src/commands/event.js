@@ -5,7 +5,8 @@ const eventUpdate = require('../utils/updateAnnoucementRole')
 const status = require("../utils/status")
 const adminCheck = require("../utils/adminCheck");
 const discordBots = require("../models/discordBot.model");
-
+const reminderAdd = require('../utils/reminderAdd');
+const timeFormatter = require('../utils/timeFormatter');
 
 const commandData = new SlashCommandBuilder()
     .setName("event")
@@ -46,6 +47,35 @@ const commandData = new SlashCommandBuilder()
                     .setDescription("The selected channel.")
                     .addChannelTypes(ChannelType.GuildText)
                     .setRequired(true)
+            )
+    )
+    .addSubcommand(subcommand =>
+        subcommand.setName("add-reminder")
+            .setDescription('Sets a reminder for a Discord Event')
+            .addStringOption(option =>
+                option.setName('event_id')
+                    .setDescription("The event ID of the Discord Event.")
+                    .setRequired(true)
+            )
+            .addNumberOption(option =>
+                option.setName("days")
+                    .setDescription("The number of days before the event for the reminder to be set.")
+                    .setRequired(false)
+            )
+            .addNumberOption(option =>
+                option.setName("hours")
+                    .setDescription("The number of hours before the event for the reminder to be set.")
+                    .setRequired(false)
+            )
+            .addNumberOption(option =>
+                option.setName("minutes")
+                    .setDescription("The number of minutes before the event for the reminder to be set.")
+                    .setRequired(false)
+            )
+            .addStringOption(option =>
+                option.setName('text')
+                    .setDescription('The text to be shown in the Announcement')
+                    .setRequired(false)
             )
     )
 
@@ -118,6 +148,51 @@ module.exports = {
                 await interaction.followUp("Global notification has been set to False.")
 
             }
+
+        }
+
+        else if (interaction.options.getSubcommand() === 'add-reminder') {
+            const event_id = interaction.options.getString('event_id');
+            const text = interaction.options.getString('text') || ''
+            const days = interaction.options.getNumber('days') || 0
+            const hours = interaction.options.getNumber('hours') || 0
+            const minutes = interaction.options.getNumber('minutes') || 0
+
+             if (!botData.guildData[0][interaction.guild.id].eventChannelId) {
+                 return await status.eventChannelNotFound(interaction)
+             }
+
+            if (days === 0 && hours === 0 && minutes === 0) {
+                return await status.invalidTime(interaction);
+            }
+
+            const event = await interaction.guild.scheduledEvents.fetch(event_id)
+
+            let totalMilliseconds = 0;
+            totalMilliseconds += days * 24 * 60 * 60 * 1000;
+            totalMilliseconds += hours * 60 * 60 * 1000;
+            totalMilliseconds += minutes * 60 * 1000;
+
+            const reminderDate = new Date(event.scheduledStartAt.getTime() - totalMilliseconds)
+            const unixTime = Math.floor(reminderDate.getTime() / 1000);
+
+            if (reminderDate < event.createdAt) {
+                return await status.timeBeforeCreation(interaction)
+            }
+
+            const data = {
+                unix: unixTime,
+                text: text
+            }
+            const result = await reminderAdd(event_id, data, interaction.guild.id)
+
+            if (!result) {
+                return await status.eventNotFound(interaction);
+            }
+            else {
+                return await status.reminderAddedSuccessfully(interaction, await timeFormatter(days, hours, minutes * 60) + "before")
+            }
+
 
         }
     }

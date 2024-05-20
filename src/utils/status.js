@@ -136,6 +136,13 @@ async function feedChannelAddSuccessful(interaction) {
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
 
+async function reminderAddedSuccessfully(interaction, time) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle(`The reminder has been added for ${time} the event.`)
+        .setColor(successColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
 async function eventChannelRemoveSuccessful(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("Event channel removed successfully.")
@@ -185,6 +192,35 @@ async function botNotAuthenticated(interaction) {
     return await interaction.followUp({ embeds: [statusEmbed] });
 }
 
+async function invalidTime(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Please enter a valid number for time.")
+        .setColor(errorColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
+async function timeBeforeCreation(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("The time you entered was before the creation of the event. Please try again with a valid time.")
+        .setColor(errorColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
+async function eventNotFound(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("No event with the corresponding ID has been found.")
+        .setColor(errorColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
+async function eventChannelNotFound(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("No event announcement channels has been set. Please use /event announcement-channel before utilizing this command.")
+        .setColor(errorColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
+
 async function defaultTextSet(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("The default text has been set successfully!")
@@ -219,5 +255,10 @@ module.exports = {
     duplicateReviewChannel,
     reviewChannelSuccess,
     channelNotPrivate,
-    defaultTextSet
+    defaultTextSet,
+    invalidTime,
+    eventNotFound,
+    reminderAddedSuccessfully,
+    timeBeforeCreation,
+    eventChannelNotFound
 }

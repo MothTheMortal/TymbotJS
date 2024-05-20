@@ -3,11 +3,11 @@ const fs = require('node:fs');
 const path = require('node:path')
 const mongoose = require('mongoose');
 const discordBotModel = require('../src/models/discordBot.model')
+const {reminderTask} = require("./utils/remindersHandler");
+
 require('dotenv').config();
 
-
 mongoose.connect(process.env.MONGODB)
-
 
 const client = new Client({
     intents: [
@@ -47,5 +47,9 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
+
+client.on('ready', async () => {
+    await reminderTask(client).start()
+})
 
 client.login(process.env.BOT_TOKEN);

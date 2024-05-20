@@ -6,7 +6,7 @@ module.exports = {
     name: Events.GuildScheduledEventCreate,
     async execute(event) {
 
-        await eventAdd(event.id, event.guild.id)
+        await eventAdd(event.id, event.guild.id, event.scheduledStartTimestamp)
         await eventAnnouncement(event)
     }
 }
