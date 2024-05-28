@@ -4,6 +4,16 @@ const successColor = "#00FF00";
 const errorColor = "#FF0000";
 
 
+
+
+async function notificationSetting(interaction, notify, onjoin=null, roleId=null) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Notification Settings")
+        .setDescription(`**Notify on Event Creation:** ${notify ? 'Enabled' : 'Disabled'}\n**Notification Role:** ${roleId ? `<@&${roleId}>` : 'None'}\n**Give Notification Role on Join:** ${onjoin ? 'Enabled' : 'Disabled'}`)
+        .setColor(successColor);
+    return await interaction.followUp({ embeds: [statusEmbed] });
+}
+
 async function adminRoleNotFound(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("Please assign an admin role with /admin-role before utilizing any commands.")
@@ -260,5 +270,6 @@ module.exports = {
     eventNotFound,
     reminderAddedSuccessfully,
     timeBeforeCreation,
-    eventChannelNotFound
+    eventChannelNotFound,
+    notificationSetting
 }

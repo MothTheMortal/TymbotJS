@@ -13,10 +13,10 @@ module.exports = async function eventAnnouncement(event, text='None') {
         rolePing = ` <@&${notify}>`
     }
 
-    if (text === 'None') {
+    if (text === 'None' || !text) {
         text = guildData[0][event.guild.id]['eventDefaultText']
     }
-
+    text = text.slice(0, 1900);
     const eventChannel = await event.client.channels.fetch(guildData[0][event.guild.id].eventChannelId);
     await eventChannel.send({ content: text + rolePing + `[.](${event.url})`})
 

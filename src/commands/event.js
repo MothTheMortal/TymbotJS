@@ -8,6 +8,7 @@ const discordBots = require("../models/discordBot.model");
 const reminderAdd = require('../utils/reminderAdd');
 const timeFormatter = require('../utils/timeFormatter');
 
+
 const commandData = new SlashCommandBuilder()
     .setName("event")
     .setDescription("Event-related commands.")
@@ -140,12 +141,13 @@ module.exports = {
                 }
 
                 await eventUpdate(interaction.guildId, notifyBool, joinBool, notificationRole.id)
-                await interaction.followUp(`Global Notification has been set to True, and will ping '${notificationRole.name}'.`)
+                return await status.notificationSetting(interaction, notifyBool, joinBool, notificationRole.id)
+
             }
             else {
 
                 await eventUpdate(interaction.guildId, notifyBool, joinBool)
-                await interaction.followUp("Global notification has been set to False.")
+                return await status.notificationSetting(interaction, notifyBool, false, false)
 
             }
 
@@ -157,7 +159,7 @@ module.exports = {
             const days = interaction.options.getNumber('days') || 0
             const hours = interaction.options.getNumber('hours') || 0
             const minutes = interaction.options.getNumber('minutes') || 0
-
+            let event;
              if (!botData.guildData[0][interaction.guild.id].eventChannelId) {
                  return await status.eventChannelNotFound(interaction)
              }
@@ -165,8 +167,12 @@ module.exports = {
             if (days === 0 && hours === 0 && minutes === 0) {
                 return await status.invalidTime(interaction);
             }
-
-            const event = await interaction.guild.scheduledEvents.fetch(event_id)
+            try {
+                event = await interaction.guild.scheduledEvents.fetch(event_id)
+            }
+            catch (err) {
+                return await status.eventNotFound(interaction);
+            }
 
             let totalMilliseconds = 0;
             totalMilliseconds += days * 24 * 60 * 60 * 1000;
