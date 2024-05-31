@@ -6,17 +6,7 @@ const authCheck = require("../utils/authCheck");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('info')
-        .setDescription('Gives information about the Bot.')
-        .addStringOption(option =>
-            option.setName('type')
-                .setDescription('Type of Information')
-                .setRequired(true)
-                .addChoices(
-                    { name: "Bot Information", value: "basic"},
-                    { name: "Feed Channels", value: "feed" },
-                    { name: "Event Channels", value: "event" }
-                )
-        ),
+        .setDescription('Gives information about the Bot.'),
     async execute(interaction) {
         await interaction.deferReply();
         const auth = await authCheck(interaction.guildId)
@@ -25,42 +15,29 @@ module.exports = {
             return await status.botNotAuthenticated(interaction)
         }
 
-        const choice = interaction.options.getString('type')
-
         const embed = new EmbedBuilder()
 
-        if (choice === "basic") {
-            const chatbotName = "chatbot"
+        const chatbotName = "chatbot"
 
-            let discordGuildNames = [];
-            const guildData = auth['guildData'][0][interaction.guild.id.toString()]
+        let discordGuildNames = [];
+        const guildData = auth['guildData'][0][interaction.guild.id.toString()]
 
-            for await (const guildID of auth['discordGuilds']) {
-                const guild = await interaction.client.guilds.fetch(guildID)
-                discordGuildNames.push(guild.name)
-            }
-
-            let description = `
-            **Chatbot:** ${chatbotName}
-            **Discord Server (${auth['discordGuilds'].length}/${auth['maxGuilds']}):** ${discordGuildNames.join(', ')}
-            **Staff Role:** ${guildData['adminRoleId'] ? `<@&${guildData['adminRoleId']}>` : 'None'}
-            **Auto-Role:** ${guildData['giveNotificationOnJoin'] ? "Enabled" : "Disabled"}
-            **Notification Role:** ${guildData['eventNotification'] ? `<@&${guildData['eventNotification']}>` : 'None'}
-            **Event Channel:** ${guildData['eventChannelId'] ? `<#${guildData['eventChannelId']}>` : 'None'}
-            **Feed Channels (${guildData['feedChannels'].length}):** ${guildData['feedChannels'].length ? guildData['feedChannels'].map(id => `<#${id}>`).join(', ') : 'None'}
-            `
-
-            embed.setTitle("Bot Information").setDescription(description).setFooter({ text: "Created by: Apnatomy"})
-
+        for await (const guildID of auth['discordGuilds']) {
+            const guild = await interaction.client.guilds.fetch(guildID)
+            discordGuildNames.push(guild.name)
         }
-        else if (choice === "feed") {
-            embed.setTitle("Feed Channels")
-                .setDescription("Feed Channels are channels where every message will be fed into the Knowledge Base")
-        }
-        else {
-            embed.setTitle("Event Channel")
-                .setDescription("The Event channel is a channel where Discord Event annoucements will be sent")
-        }
+
+        let description = `
+        **Chatbot:** ${chatbotName}
+        **Discord Server (${auth['discordGuilds'].length}/${auth['maxGuilds']}):** ${discordGuildNames.join(', ')}
+        **Staff Role:** ${guildData['adminRoleId'] ? `<@&${guildData['adminRoleId']}>` : 'None'}
+        **Auto-Role:** ${guildData['giveNotificationOnJoin'] ? "Enabled" : "Disabled"}
+        **Notification Role:** ${guildData['eventNotification'] ? `<@&${guildData['eventNotification']}>` : 'None'}
+        **Event Channel:** ${guildData['eventChannelId'] ? `<#${guildData['eventChannelId']}>` : 'None'}
+        **Feed Channels (${guildData['feedChannels'].length}):** ${guildData['feedChannels'].length ? guildData['feedChannels'].map(id => `<#${id}>`).join(', ') : 'None'}
+        `
+
+        embed.setTitle("Bot Information").setDescription(description).setFooter({ text: "Created by: Apnatomy"})
 
         await interaction.followUp({ embeds: [embed] })
 
