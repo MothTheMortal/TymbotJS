@@ -58,8 +58,8 @@ module.exports = {
                 .setDescription("Feed Channels are channels where every message will be fed into the Knowledge Base")
         }
         else {
-            embed.setTitle("Event Channels")
-                .setDescription("Event channels are channels where Discord Event annoucements will be sent")
+            embed.setTitle("Event Channel")
+                .setDescription("The Event channel is a channel where Discord Event annoucements will be sent")
         }
 
         await interaction.followUp({ embeds: [embed] })
