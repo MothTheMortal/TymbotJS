@@ -1,6 +1,5 @@
 const discordBots = require("../models/discordBot.model");
 const cron = require('node-cron');
-const console = require("node:console");
 const eventAnnouncement = require('../utils/eventAnnoucement')
 
 function removeReminder(events, event, reminder) {
@@ -12,7 +11,7 @@ function removeReminder(events, event, reminder) {
     return events;
 }
 
-const reminderTask = (client) => cron.schedule('*/10 * * * * *', async () => {
+const reminderTask = (client) => cron.schedule('*/3 * * * * *', async () => {
     try {
         const bots = await discordBots.find({});
         const unixTime = Math.floor(Date.now() / 1000);
@@ -22,7 +21,68 @@ const reminderTask = (client) => cron.schedule('*/10 * * * * *', async () => {
             let changesMade = false;
             const guildData = JSON.parse(JSON.stringify(bot.guildData));
             for (let serverKey of Object.keys(guildData[0])) {
-                let serverEvents = guildData[0][serverKey].events;
+
+                let serverData = guildData[0][serverKey];
+
+                const adminRoleId = serverData['adminRoleId'];
+                const reviewChannelId = serverData['reviewChannelId'];
+                const eventChannelId = serverData['eventChannelId'];
+                const feedChannelsId = serverData['feedChannels']
+
+                try {
+                    guild = await client.guilds.fetch(serverKey.toString());
+                }
+                catch (err) {
+                    delete guildData[0][serverKey];
+                }
+
+                if (adminRoleId) {
+                    let role;
+                    try {
+                        role = await guild.roles.fetch(adminRoleId);
+                    } catch (err) {}
+
+                    if (!role) {
+                        serverData["adminRoleId"] = false;
+                        changesMade = true;
+                    }
+                }
+
+                if (reviewChannelId) {
+                    let channel;
+                    try {
+                        channel = await guild.channels.fetch(reviewChannelId);
+                    } catch (err) {}
+
+                    if (!channel) {
+                        serverData["reviewChannelId"] = false;
+                        changesMade = true;
+
+                    }
+                }
+
+                if (eventChannelId) {
+                    let channel;
+                    try {
+                        channel = await guild.channels.fetch(eventChannelId);
+                    } catch (err) {}
+
+                    if (!channel) {
+                        changesMade = true;
+                        serverData["eventChannelId"] = false;
+                    }
+                }
+
+                if (feedChannelsId) {
+                    const channels = await Promise.all(
+                        feedChannelsId.map(channelId => guild.channels.fetch(channelId).catch(err => null))
+                    );
+                    changesMade = true;
+                    serverData["feedChannels"] = channels.filter(channel => channel).map(channel => channel?.id);
+                }
+
+                let serverEvents = serverData.events;
+
                 for (let i = 0; i < serverEvents.length; i++) {
                     let event = serverEvents[i];
                     guild = await client.guilds.fetch(event.guildId.toString());

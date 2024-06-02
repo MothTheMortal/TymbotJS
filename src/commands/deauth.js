@@ -20,7 +20,11 @@ module.exports = {
 
         if (data) {
             data['discordGuilds'].pop(interaction.guildId.toString())
+            delete data['guildData'][0][interaction.guildId.toString()]
+            await discordBots.updateOne({discordGuilds: interaction.guildId.toString()}, {$set: {guildData: data['guildData']}})
             await discordBots.updateOne({discordGuilds: interaction.guildId.toString()}, {$set: {discordGuilds: data['discordGuilds']}})
+
+
             return await status.integrationRemoved(interaction)
         }
         else {
