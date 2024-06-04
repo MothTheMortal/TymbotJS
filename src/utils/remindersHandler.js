@@ -19,7 +19,9 @@ const reminderTask = (client) => cron.schedule('*/3 * * * * *', async () => {
 
         for (let bot of bots) {
             let changesMade = false;
-            const guildData = JSON.parse(JSON.stringify(bot.guildData));
+            let guildData = JSON.parse(JSON.stringify(bot.guildData));
+            let discordGuilds = JSON.parse(JSON.stringify(bot.discordGuilds));
+
             for (let serverKey of Object.keys(guildData[0])) {
 
                 let serverData = guildData[0][serverKey];
@@ -34,6 +36,8 @@ const reminderTask = (client) => cron.schedule('*/3 * * * * *', async () => {
                 }
                 catch (err) {
                     delete guildData[0][serverKey];
+                    discordGuilds.pop(serverKey.toString())
+
                 }
 
                 if (adminRoleId) {
@@ -113,6 +117,7 @@ const reminderTask = (client) => cron.schedule('*/3 * * * * *', async () => {
             }
             if (changesMade) {
                 await discordBots.updateOne({ discordGuilds: guild.id.toString() }, { $set: { guildData } });
+                await discordBots.updateOne({ discordGuilds: guild.id.toString() }, { $set: { discordGuilds } });
             }
         }
     } catch (error) {
