@@ -2,7 +2,7 @@ const { Events } = require('discord.js');
 const chatbotResponse = require('../utils/chatbotResponse');
 const updateKnowledgeBase = require('../utils/updateKnowledgeBase');
 const authenticate = require('../utils/authCheck')
-
+const getEventData = require('../utils/getEventData');
 module.exports = {
     name: Events.MessageCreate,
     async execute(message) {
@@ -24,14 +24,15 @@ module.exports = {
         if (!auth) {
             return
         }
-
-        return
-
-        const botData = auth.toJson()
-
-        if (botData.feedChannels.includes(message.channel.id.toString())) {
-            await updateKnowledgeBase(message.content, message.guildId)
+        if (message.content.includes('event')) {
+            await getEventData({date: ['2024-06-22']}, message.client, message.guild.id)
         }
+        // const botData = auth.toJson()
+        // if (botData.feedChannels.includes(message.channel.id.toString())) {
+        //     await updateKnowledgeBase(message.content, message.guildId)
+        // }
+
+
     }
 
 }

@@ -35,6 +35,21 @@ for (const file of commandFolders) {
     }
 }
 
+const guildFoldersPath = path.join(__dirname, 'guild_commands')
+const guildCommandFolders = fs.readdirSync(guildFoldersPath).filter(file => file.endsWith('.js'));
+
+for (const file of guildCommandFolders) {
+    const guildFilePath = path.join(guildFoldersPath, file);
+    const guildCommand = require(guildFilePath);
+    if ('data' in guildCommand && 'execute' in guildCommand) {
+        client.commands.set(guildCommand.data.name, guildCommand)
+    } else {
+        console.log(`Command at ${guildFilePath} is incomplete!`)
+
+    }
+}
+
+
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 

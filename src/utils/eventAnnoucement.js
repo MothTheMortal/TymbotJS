@@ -17,8 +17,16 @@ module.exports = async function eventAnnouncement(event, text='None') {
         text = guildData[0][event.guild.id]['eventDefaultText']
     }
     text = text.slice(0, 1900);
-    const eventChannel = await event.client.channels.fetch(guildData[0][event.guild.id].eventChannelId);
-    await eventChannel.send({ content: text + rolePing + `[.](${event.url})`})
+    if (guildData[0][event.guild.id].eventChannelId) {
+        const eventChannel = await event.client.channels.fetch(guildData[0][event.guild.id].eventChannelId);
+        await eventChannel.send({content: text + rolePing + `[.](${event.url})`})
+    }
 
+    if (guildData.eventChannelId) {
+        const eventChannel = await event.client.channels.fetch(
+            guildData.eventChannelId
+        );
+        await eventChannel.send({ content: text + rolePing + `[.](${event.url})` });
+    }
 
 }
