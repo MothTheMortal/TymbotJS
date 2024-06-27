@@ -21,12 +21,14 @@ module.exports = {
             }
         }
 
-        if (!auth) {
-            return
-        }
-        if (message.content.includes('event')) {
-            await getEventData({date: ['2024-06-22']}, message.client, message.guild.id)
-        }
+        // if (!auth) {
+        //     return
+        // }
+
+
+        // if (message.content.includes('event')) {
+        //     await getEventData({date: ['2024-06-22']}, message.client, message.guild.id)
+        // }
         // const botData = auth.toJson()
         // if (botData.feedChannels.includes(message.channel.id.toString())) {
         //     await updateKnowledgeBase(message.content, message.guildId)

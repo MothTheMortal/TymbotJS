@@ -13,13 +13,13 @@ module.exports = {
 
         const commands = [];
 
-        const foldersPath = __dirname
-        const commandFolders = fs.readdirSync(__dirname).filter(file => file.endsWith(".js"));
+        const foldersPath = path.join(__dirname, "..", 'commands')
+        const commandFolders = fs.readdirSync(foldersPath).filter(file => file.endsWith(".js"));
 
         for (const file of commandFolders) {
             const filePath = path.join(foldersPath, file);
             const command = require(filePath);
-            if ('data' in command && 'execute' in command) {
+            if (('data' in command && 'execute' in command) || ('context' in command && 'data' in command)) {
                 commands.push(command.data.toJSON());
             } else {
                 await interaction.followUp({content: `Command at ${filePath} is incomplete!`})
