@@ -109,6 +109,13 @@ module.exports = {
                 return await status.alreadyFeedChannel(interaction)
             }
 
+            if (!channel.permissionsFor(interaction.client.user).has("ViewChannel")) {
+                return await status.channelNotViewable(interaction)
+            }
+
+            if (!channel.permissionsFor(interaction.client.user).has("SendMessages")) {
+                return await status.channelCannotSendMessage(interaction)
+            }
 
             await addEventChannel(channel.id, channel.guildId);
             await status.eventChannelAddSuccessful(interaction)

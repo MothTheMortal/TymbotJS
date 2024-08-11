@@ -76,6 +76,21 @@ async function channelNotPrivate(interaction) {
         .setColor(errorColor);
     return await interaction.followUp({embeds: [statusEmbed]});
 }
+
+async function channelNotViewable(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Bot does not have permission to view the selected channel.")
+        .setColor(errorColor);
+    return await interaction.followUp({embeds: [statusEmbed]});
+}
+
+async function channelCannotSendMessage(interaction) {
+    const statusEmbed = new EmbedBuilder()
+        .setTitle("Bot does not have permission to send messages in the selected channel.")
+        .setColor(errorColor);
+    return await interaction.followUp({embeds: [statusEmbed]});
+}
+
 async function integrationAlreadyActive(interaction) {
     const statusEmbed = new EmbedBuilder()
         .setTitle("Integration is already active.")
@@ -271,5 +286,7 @@ module.exports = {
     reminderAddedSuccessfully,
     timeBeforeCreation,
     eventChannelNotFound,
-    notificationSetting
+    notificationSetting,
+    channelNotViewable,
+    channelCannotSendMessage
 }

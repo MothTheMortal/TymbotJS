@@ -7,6 +7,17 @@ module.exports = async function chatbotResponse(message, clientID) {
     if(match.test(messageContent)) {
         messageContent = messageContent.replace(/<@.*?>/g, '');
     }
+    let messageObj;
+
+    if (message.channel.constructor.name.toLowerCase().includes("thread")) {
+        messageObj = await message.channel.send({ content: "*Responding... 🕐*"})
+    }
+    else {
+        const threadTitle = message.content.replace(`<@${clientID}>`, '');
+        const thread = await message.startThread({ name: threadTitle, autoArchiveDuration: 60});
+        messageObj = await thread.send({ content: "*Responding... 🕐*" })
+    }
+
 
     const response = await getResponse(messageContent, message.channel.guild.id);
 
@@ -54,15 +65,13 @@ module.exports = async function chatbotResponse(message, clientID) {
             })
     }
 
-    let responseMsg = response.data.response;
-
+    // let responseMsg = response.data.response;
+    let responseMsg = response
     if (message.channel.constructor.name.toLowerCase().includes("thread")) {
-       await message.channel.send({ content: `<@${message.author.id}> ${responseMsg}`}).then(msg => handleResponse(msg, message))
+        await messageObj.edit({ content: `<@${message.author.id}> ${responseMsg}`}).then(msg => handleResponse(msg, message))
     }
     else {
-        const threadTitle = message.content.replace(`<@${clientID}>`, '');
-        const thread = await message.startThread({ name: threadTitle, autoArchiveDuration: 60});
-        await thread.send({ content:`<@${message.author.id}> ${responseMsg}` }).then(msg => handleResponse(msg, message))
+        await messageObj.edit({ content:`<@${message.author.id}> ${responseMsg}` }).then(msg => handleResponse(msg, message))
     }
 
 

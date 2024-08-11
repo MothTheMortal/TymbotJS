@@ -37,6 +37,14 @@ module.exports = {
             return await status.channelNotPrivate(interaction)
         }
 
+        if (!channel.permissionsFor(interaction.client.user).has("ViewChannel")) {
+            return await status.channelNotViewable(interaction)
+        }
+
+        if (!channel.permissionsFor(interaction.client.user).has("SendMessages")) {
+            return await status.channelCannotSendMessage(interaction)
+        }
+
         if (data[0][interaction.guildId]["reviewChannelId"] === channel.id.toString()) {
             return await status.duplicateReviewChannel(interaction)
         }
